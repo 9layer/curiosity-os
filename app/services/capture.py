@@ -67,3 +67,13 @@ async def list_inbox(limit: int = 20):
             .limit(limit)
         )).scalars().all()
         return rows
+    
+async def list_by_status(status: CaptureStatus, limit: int = 30):
+    async with SessionLocal() as s:
+        rows = (await s.execute(
+            select(Capture)
+            .where(Capture.status == status)
+            .order_by(Capture.created_at.desc())
+            .limit(limit)
+        )).scalars().all()
+        return rows

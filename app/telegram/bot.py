@@ -87,6 +87,28 @@ async def inbox_cmd(m: Message):
         suffix = ("\n" + " ".join(meta)) if meta else ""
         await m.answer(f"#{c.id}: {c.raw_text}{suffix}", reply_markup=decision_kb(c.id))
 
+@dp.message(Command("list"))
+async def list_cmd(m: Message, command: CommandObject):
+    if not allowed(m.from_user.id):
+        return
+    valid = [s.value for s in CaptureStatus]
+    arg = (command.args or "").strip().lower()
+    if arg not in valid:
+        await m.answer("Укажи статус: /list <" + " | ".join(valid) + ">")
+        return
+    rows = await cap.list_by_status(CaptureStatus(arg))
+    if not rows:
+        await m.answer(f"В «{arg}» пусто.")
+        return
+    await m.answer(f"«{arg}» — {len(rows)} записей:")
+    for c in rows:
+        meta = []
+        if c.topic:
+            meta.append(c.topic)
+        if c.suggested_project:
+            meta.append(f"→ {c.suggested_project}")
+        suffix = ("\n" + " ".join(meta)) if meta else ""
+        await m.answer(f"#{c.id}: {c.raw_text}{suffix}", reply_markup=decision_kb(c.id))
 
 @dp.message(Command("review"))
 async def review_cmd(m: Message):
