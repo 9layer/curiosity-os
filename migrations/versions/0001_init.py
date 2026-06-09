@@ -16,6 +16,7 @@ depends_on = None
 capture_status = postgresql.ENUM(
     "inbox", "explore", "scheduled", "someday", "archived", "deleted",
     name="capture_status",
+    create_type=False,
 )
 
 
